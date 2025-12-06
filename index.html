@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Track your expenses, set budget goals, and gain insights into your spending habits with our modern expense tracker.">
+    <title>ExpenseFlow - Smart Budget Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">💰</span>
+                <span class="logo-text">ExpenseFlow</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-section="transactions">
+                    <span class="nav-icon">💳</span>
+                    <span>Transactions</span>
+                </a>
+                <a href="#" class="nav-item" data-section="budgets">
+                    <span class="nav-icon">🎯</span>
+                    <span>Budgets</span>
+                </a>
+                <a href="#" class="nav-item" data-section="categories">
+                    <span class="nav-icon">📁</span>
+                    <span>Categories</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn-add-expense" id="openAddModal">
+                    <span>+</span> Add Expense
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Welcome back! Here's your financial overview.</p>
+                </div>
+                <div class="header-right">
+                    <div class="date-display">
+                        <span class="date-icon">📅</span>
+                        <span id="currentDate"></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Summary Cards -->
+            <section class="summary-cards">
+                <div class="card summary-card balance">
+                    <div class="card-icon">💵</div>
+                    <div class="card-content">
+                        <span class="card-label">Total Balance</span>
+                        <span class="card-value" id="totalBalance">$0.00</span>
+                    </div>
+                    <div class="card-trend positive">
+                        <span>↑ 12%</span>
+                    </div>
+                </div>
+                <div class="card summary-card income">
+                    <div class="card-icon">📈</div>
+                    <div class="card-content">
+                        <span class="card-label">Monthly Income</span>
+                        <span class="card-value" id="monthlyIncome">$0.00</span>
+                    </div>
+                    <div class="card-trend positive">
+                        <span>↑ 8%</span>
+                    </div>
+                </div>
+                <div class="card summary-card expenses">
+                    <div class="card-icon">📉</div>
+                    <div class="card-content">
+                        <span class="card-label">Monthly Expenses</span>
+                        <span class="card-value" id="monthlyExpenses">$0.00</span>
+                    </div>
+                    <div class="card-trend negative">
+                        <span>↓ 5%</span>
+                    </div>
+                </div>
+                <div class="card summary-card savings">
+                    <div class="card-icon">🏦</div>
+                    <div class="card-content">
+                        <span class="card-label">Savings Rate</span>
+                        <span class="card-value" id="savingsRate">0%</span>
+                    </div>
+                    <div class="card-trend positive">
+                        <span>↑ 3%</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h2>Spending by Category</h2>
+                        <span class="time-filter">This Month</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h2>Spending Trends</h2>
+                        <span class="time-filter">Last 7 Days</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Budget Goals & Insights -->
+            <section class="bottom-section">
+                <!-- Budget Goals -->
+                <div class="card budget-goals-card">
+                    <div class="card-header">
+                        <h2>Budget Goals</h2>
+                        <button class="btn-edit-budgets" id="editBudgets">Edit</button>
+                    </div>
+                    <div class="budget-list" id="budgetList">
+                        <!-- Budget items will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Key Insights -->
+                <div class="card insights-card">
+                    <div class="card-header">
+                        <h2>Key Insights</h2>
+                        <span class="insight-badge">AI Powered</span>
+                    </div>
+                    <div class="insights-list" id="insightsList">
+                        <!-- Insights will be injected here -->
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="card transactions-card">
+                    <div class="card-header">
+                        <h2>Recent Transactions</h2>
+                        <a href="#" class="view-all" id="viewAllTransactions">View All</a>
+                    </div>
+                    <div class="transactions-list" id="transactionsList">
+                        <!-- Transactions will be injected here -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- All Transactions Modal -->
+    <div class="modal-overlay" id="transactionsModal">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2>All Transactions</h2>
+                <button class="modal-close" id="closeTransactionsModal">&times;</button>
+            </div>
+            <div class="all-transactions-list" id="allTransactionsList"
+                style="padding: 20px; max-height: 60vh; overflow-y: auto;">
+                <!-- All transactions will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Expense Modal -->
+    <div class="modal-overlay" id="expenseModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Add New Expense</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <form id="expenseForm" class="expense-form">
+                <div class="form-group">
+                    <label for="expenseAmount">Amount</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">₹</span>
+                        <input type="number" id="expenseAmount" placeholder="0.00" step="0.01" min="0" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="expenseDescription">Description</label>
+                    <input type="text" id="expenseDescription" placeholder="What was this expense for?" required>
+                </div>
+                <div class="form-group">
+                    <label for="expenseCategory">Category</label>
+                    <div class="category-select" id="categorySelect">
+                        <div class="category-option" data-category="food">
+                            <span class="category-icon">🍕</span>
+                            <span>Food & Dining</span>
+                        </div>
+                        <div class="category-option" data-category="transport">
+                            <span class="category-icon">🚗</span>
+                            <span>Transportation</span>
+                        </div>
+                        <div class="category-option" data-category="housing">
+                            <span class="category-icon">🏠</span>
+                            <span>Housing</span>
+                        </div>
+                        <div class="category-option" data-category="shopping">
+                            <span class="category-icon">🛒</span>
+                            <span>Shopping</span>
+                        </div>
+                        <div class="category-option" data-category="entertainment">
+                            <span class="category-icon">🎮</span>
+                            <span>Entertainment</span>
+                        </div>
+                        <div class="category-option" data-category="healthcare">
+                            <span class="category-icon">💊</span>
+                            <span>Healthcare</span>
+                        </div>
+                        <div class="category-option" data-category="education">
+                            <span class="category-icon">📚</span>
+                            <span>Education</span>
+                        </div>
+                        <div class="category-option" data-category="travel">
+                            <span class="category-icon">✈️</span>
+                            <span>Travel</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="expenseCategory" required>
+                </div>
+                <input type="hidden" id="expenseDate">
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" id="cancelExpense">Cancel</button>
+                    <button type="submit" class="btn-submit">Add Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Income Modal -->
+    <div class="modal-overlay" id="incomeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Add Income</h2>
+                <button class="modal-close" id="closeIncomeModal">&times;</button>
+            </div>
+            <form id="incomeForm" class="expense-form">
+                <div class="form-group">
+                    <label for="incomeAmount">Amount</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">₹</span>
+                        <input type="number" id="incomeAmount" placeholder="0.00" step="0.01" min="0" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="incomeDescription">Description</label>
+                    <input type="text" id="incomeDescription" placeholder="e.g., Salary, Freelance..." required>
+                </div>
+                <input type="hidden" id="incomeDate">
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" id="cancelIncome">Cancel</button>
+                    <button type="submit" class="btn-submit income-btn">Add Income</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quick Add Floating Button -->
+    <div class="quick-add-container">
+        <button class="quick-add-btn" id="quickAddBtn">
+            <span class="plus-icon">+</span>
+        </button>
+        <div class="quick-add-options" id="quickAddOptions">
+            <button class="quick-option expense-option" id="quickAddExpense">
+                <span>💸</span> Expense
+            </button>
+            <button class="quick-option income-option" id="quickAddIncome">
+                <span>💵</span> Income
+            </button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
