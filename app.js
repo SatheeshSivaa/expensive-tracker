@@ -52,11 +52,20 @@ function initializeApp() {
 }
 
 function loadFromStorage() {
-    // Clear old data and start fresh
-    localStorage.removeItem('expenseFlowData');
-    state.transactions = [];
-    state.budgets = { ...DEFAULT_BUDGETS };
-    state.income = 0;
+    const saved = localStorage.getItem('expenseFlowData');
+    if (saved) {
+        try {
+            const data = JSON.parse(saved);
+            state.transactions = data.transactions || [];
+            state.budgets = data.budgets || { ...DEFAULT_BUDGETS };
+            state.income = data.income || 0;
+        } catch (e) {
+            console.error('Error loading data from storage:', e);
+            state.transactions = [];
+            state.budgets = { ...DEFAULT_BUDGETS };
+            state.income = 0;
+        }
+    }
 }
 
 function saveToStorage() {
@@ -433,10 +442,11 @@ function renderTransactions() {
                 <div class="transaction-name">${t.description}</div>
                 <div class="transaction-category">${catName}</div>
             </div>
-            <div>
+            <div class="transaction-right">
                 <div class="transaction-amount ${t.type}">${t.type === 'income' ? '+' : '-'}${formatCurrency(t.amount)}</div>
                 <div class="transaction-date">${formatDisplayDate(t.date)}</div>
             </div>
+            <button class="delete-btn" onclick="deleteTransaction(${t.id})" title="Delete transaction">🗑️</button>
         `;
         list.appendChild(item);
     });
@@ -572,10 +582,11 @@ function openTransactionsModal() {
                     <div class="transaction-name">${t.description}</div>
                     <div class="transaction-category">${catName}</div>
                 </div>
-                <div>
+                <div class="transaction-right">
                     <div class="transaction-amount ${t.type}">${t.type === 'income' ? '+' : '-'}${formatCurrency(t.amount)}</div>
                     <div class="transaction-date">${formatDisplayDate(t.date)}</div>
                 </div>
+                <button class="delete-btn" onclick="deleteTransaction(${t.id})" title="Delete transaction">🗑️</button>
             `;
             list.appendChild(item);
         });
@@ -651,4 +662,27 @@ function handleIncomeSubmit(e) {
     e.target.reset();
     document.getElementById('incomeDate').value = formatDate(new Date());
     closeModal(document.getElementById('incomeModal'));
+}
+
+// ========================================
+// Delete Transaction
+// ========================================
+function deleteTransaction(id) {
+    if (confirm('Are you sure you want to delete this transaction?')) {
+        state.transactions = state.transactions.filter(t => t.id !== id);
+        saveToStorage();
+
+        // Update UI
+        renderSummaryCards();
+        updateCharts();
+        renderBudgetGoals();
+        renderInsights();
+        renderTransactions();
+
+        // If transactions modal is open, refresh it
+        const modal = document.getElementById('transactionsModal');
+        if (modal.classList.contains('active')) {
+            openTransactionsModal();
+        }
+    }
 }
