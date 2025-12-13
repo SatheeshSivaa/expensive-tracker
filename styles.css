@@ -578,6 +578,38 @@ body {
     transform: scale(1.1);
 }
 
+/* Transaction Actions */
+.transaction-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+}
+
+.edit-btn {
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    opacity: 0;
+    transition: var(--transition-fast);
+    padding: 8px;
+    border-radius: var(--radius-sm);
+}
+
+.transaction-item:hover .edit-btn {
+    opacity: 1;
+}
+
+.edit-btn:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: scale(1.1);
+}
+
+.transaction-actions .delete-btn {
+    margin-left: 0;
+}
+
 /* Modal */
 .modal-overlay {
     position: fixed;

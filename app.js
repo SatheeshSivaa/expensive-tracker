@@ -446,7 +446,10 @@ function renderTransactions() {
                 <div class="transaction-amount ${t.type}">${t.type === 'income' ? '+' : '-'}${formatCurrency(t.amount)}</div>
                 <div class="transaction-date">${formatDisplayDate(t.date)}</div>
             </div>
-            <button class="delete-btn" onclick="deleteTransaction(${t.id})" title="Delete transaction">🗑️</button>
+            <div class="transaction-actions">
+                <button class="edit-btn" onclick="openEditModal(${t.id})" title="Edit transaction">✏️</button>
+                <button class="delete-btn" onclick="deleteTransaction(${t.id})" title="Delete transaction">🗑️</button>
+            </div>
         `;
         list.appendChild(item);
     });
@@ -543,6 +546,38 @@ function setupEventListeners() {
     transactionsModal.addEventListener('click', (e) => {
         if (e.target === transactionsModal) closeModal(transactionsModal);
     });
+
+    // Edit modal controls
+    const editModal = document.getElementById('editModal');
+    document.getElementById('closeEditModal').addEventListener('click', () => closeModal(editModal));
+    document.getElementById('cancelEdit').addEventListener('click', () => closeModal(editModal));
+    editModal.addEventListener('click', (e) => {
+        if (e.target === editModal) closeModal(editModal);
+    });
+
+    // Edit category selection
+    document.querySelectorAll('#editCategorySelect .category-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+            document.querySelectorAll('#editCategorySelect .category-option').forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            document.getElementById('editCategory').value = opt.dataset.category;
+        });
+    });
+
+    // Edit form submission
+    document.getElementById('editForm').addEventListener('submit', handleEditSubmit);
+
+    // Budget modal controls
+    const budgetModal = document.getElementById('budgetModal');
+    document.getElementById('editBudgets').addEventListener('click', () => openBudgetModal());
+    document.getElementById('closeBudgetModal').addEventListener('click', () => closeModal(budgetModal));
+    document.getElementById('cancelBudget').addEventListener('click', () => closeModal(budgetModal));
+    budgetModal.addEventListener('click', (e) => {
+        if (e.target === budgetModal) closeModal(budgetModal);
+    });
+
+    // Budget form submission
+    document.getElementById('budgetForm').addEventListener('submit', handleBudgetSubmit);
 }
 
 function openModal(modal) {
@@ -586,7 +621,10 @@ function openTransactionsModal() {
                     <div class="transaction-amount ${t.type}">${t.type === 'income' ? '+' : '-'}${formatCurrency(t.amount)}</div>
                     <div class="transaction-date">${formatDisplayDate(t.date)}</div>
                 </div>
-                <button class="delete-btn" onclick="deleteTransaction(${t.id})" title="Delete transaction">🗑️</button>
+                <div class="transaction-actions">
+                    <button class="edit-btn" onclick="openEditModal(${t.id})" title="Edit transaction">✏️</button>
+                    <button class="delete-btn" onclick="deleteTransaction(${t.id})" title="Delete transaction">🗑️</button>
+                </div>
             `;
             list.appendChild(item);
         });
@@ -685,4 +723,129 @@ function deleteTransaction(id) {
             openTransactionsModal();
         }
     }
+}
+
+// ========================================
+// Edit Transaction
+// ========================================
+function openEditModal(id) {
+    const transaction = state.transactions.find(t => t.id === id);
+    if (!transaction) return;
+
+    const editModal = document.getElementById('editModal');
+
+    // Fill form fields
+    document.getElementById('editTransactionId').value = transaction.id;
+    document.getElementById('editTransactionType').value = transaction.type;
+    document.getElementById('editAmount').value = transaction.amount;
+    document.getElementById('editDescription').value = transaction.description;
+    document.getElementById('editDate').value = transaction.date;
+
+    // Handle category for expenses
+    const categoryGroup = document.getElementById('editCategoryGroup');
+    if (transaction.type === 'expense') {
+        categoryGroup.style.display = 'block';
+        document.getElementById('editCategory').value = transaction.category;
+
+        // Clear previous selection and select current category
+        document.querySelectorAll('#editCategorySelect .category-option').forEach(opt => {
+            opt.classList.remove('selected');
+            if (opt.dataset.category === transaction.category) {
+                opt.classList.add('selected');
+            }
+        });
+    } else {
+        // Hide category for income
+        categoryGroup.style.display = 'none';
+    }
+
+    openModal(editModal);
+}
+
+function handleEditSubmit(e) {
+    e.preventDefault();
+
+    const id = parseInt(document.getElementById('editTransactionId').value);
+    const type = document.getElementById('editTransactionType').value;
+    const amount = parseFloat(document.getElementById('editAmount').value);
+    const description = document.getElementById('editDescription').value;
+    const date = document.getElementById('editDate').value;
+    const category = type === 'expense' ? document.getElementById('editCategory').value : null;
+
+    if (type === 'expense' && !category) {
+        alert('Please select a category');
+        return;
+    }
+
+    // Find and update the transaction
+    const index = state.transactions.findIndex(t => t.id === id);
+    if (index !== -1) {
+        state.transactions[index] = {
+            ...state.transactions[index],
+            amount,
+            description,
+            category,
+            date
+        };
+        saveToStorage();
+
+        // Update UI
+        renderSummaryCards();
+        updateCharts();
+        renderBudgetGoals();
+        renderInsights();
+        renderTransactions();
+
+        // If transactions modal is open, refresh it
+        const transactionsModal = document.getElementById('transactionsModal');
+        if (transactionsModal.classList.contains('active')) {
+            openTransactionsModal();
+        }
+
+        // Close edit modal
+        closeModal(document.getElementById('editModal'));
+    }
+}
+
+// ========================================
+// Budget Goals Editing
+// ========================================
+function openBudgetModal() {
+    const budgetModal = document.getElementById('budgetModal');
+
+    // Pre-fill the form with current budget values
+    document.getElementById('budgetFood').value = state.budgets.food || 500;
+    document.getElementById('budgetTransport').value = state.budgets.transport || 200;
+    document.getElementById('budgetShopping').value = state.budgets.shopping || 300;
+    document.getElementById('budgetEntertainment').value = state.budgets.entertainment || 150;
+
+    openModal(budgetModal);
+}
+
+function handleBudgetSubmit(e) {
+    e.preventDefault();
+
+    // Get new budget values
+    const food = parseFloat(document.getElementById('budgetFood').value) || 0;
+    const transport = parseFloat(document.getElementById('budgetTransport').value) || 0;
+    const shopping = parseFloat(document.getElementById('budgetShopping').value) || 0;
+    const entertainment = parseFloat(document.getElementById('budgetEntertainment').value) || 0;
+
+    // Update state
+    state.budgets = {
+        food,
+        transport,
+        shopping,
+        entertainment
+    };
+
+    // Save to storage
+    saveToStorage();
+
+    // Update UI
+    renderBudgetGoals();
+    renderInsights();
+
+    // Close modal
+    closeModal(document.getElementById('budgetModal'));
 }
