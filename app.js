@@ -11,7 +11,17 @@ const CATEGORIES = {
     entertainment: { name: 'Entertainment', icon: '🎮', color: '#bb8fce' },
     healthcare: { name: 'Healthcare', icon: '💊', color: '#58d68d' },
     education: { name: 'Education', icon: '📚', color: '#5dade2' },
-    travel: { name: 'Travel', icon: '✈️', color: '#f0b27a' }
+    travel: { name: 'Travel', icon: '✈️', color: '#f0b27a' },
+    bills: { name: 'Bills & Utilities', icon: '💼', color: '#e74c3c' },
+    clothing: { name: 'Clothing & Fashion', icon: '👔', color: '#9b59b6' },
+    fitness: { name: 'Fitness & Gym', icon: '💪', color: '#27ae60' },
+    personalcare: { name: 'Personal Care', icon: '💇', color: '#e91e63' },
+    gifts: { name: 'Gifts & Donations', icon: '🎁', color: '#ff9800' },
+    pets: { name: 'Pets', icon: '🐕', color: '#795548' },
+    subscriptions: { name: 'Subscriptions', icon: '📱', color: '#673ab7' },
+    coffee: { name: 'Coffee & Drinks', icon: '☕', color: '#8d6e63' },
+    repairs: { name: 'Repairs & Maintenance', icon: '🔧', color: '#607d8b' },
+    savings: { name: 'Savings & Investments', icon: '💰', color: '#ffc107' }
 };
 
 // Default Budget Goals
@@ -19,7 +29,17 @@ const DEFAULT_BUDGETS = {
     food: 500,
     transport: 200,
     shopping: 300,
-    entertainment: 150
+    entertainment: 150,
+    bills: 300,
+    clothing: 200,
+    fitness: 100,
+    personalcare: 100,
+    gifts: 150,
+    pets: 100,
+    subscriptions: 200,
+    coffee: 100,
+    repairs: 100,
+    savings: 500
 };
 
 // App State
@@ -818,6 +838,16 @@ function openBudgetModal() {
     document.getElementById('budgetTransport').value = state.budgets.transport || 200;
     document.getElementById('budgetShopping').value = state.budgets.shopping || 300;
     document.getElementById('budgetEntertainment').value = state.budgets.entertainment || 150;
+    document.getElementById('budgetBills').value = state.budgets.bills || 300;
+    document.getElementById('budgetClothing').value = state.budgets.clothing || 200;
+    document.getElementById('budgetFitness').value = state.budgets.fitness || 100;
+    document.getElementById('budgetPersonalcare').value = state.budgets.personalcare || 100;
+    document.getElementById('budgetGifts').value = state.budgets.gifts || 150;
+    document.getElementById('budgetPets').value = state.budgets.pets || 100;
+    document.getElementById('budgetSubscriptions').value = state.budgets.subscriptions || 200;
+    document.getElementById('budgetCoffee').value = state.budgets.coffee || 100;
+    document.getElementById('budgetRepairs').value = state.budgets.repairs || 100;
+    document.getElementById('budgetSavings').value = state.budgets.savings || 500;
 
     openModal(budgetModal);
 }
@@ -830,13 +860,33 @@ function handleBudgetSubmit(e) {
     const transport = parseFloat(document.getElementById('budgetTransport').value) || 0;
     const shopping = parseFloat(document.getElementById('budgetShopping').value) || 0;
     const entertainment = parseFloat(document.getElementById('budgetEntertainment').value) || 0;
+    const bills = parseFloat(document.getElementById('budgetBills').value) || 0;
+    const clothing = parseFloat(document.getElementById('budgetClothing').value) || 0;
+    const fitness = parseFloat(document.getElementById('budgetFitness').value) || 0;
+    const personalcare = parseFloat(document.getElementById('budgetPersonalcare').value) || 0;
+    const gifts = parseFloat(document.getElementById('budgetGifts').value) || 0;
+    const pets = parseFloat(document.getElementById('budgetPets').value) || 0;
+    const subscriptions = parseFloat(document.getElementById('budgetSubscriptions').value) || 0;
+    const coffee = parseFloat(document.getElementById('budgetCoffee').value) || 0;
+    const repairs = parseFloat(document.getElementById('budgetRepairs').value) || 0;
+    const savings = parseFloat(document.getElementById('budgetSavings').value) || 0;
 
     // Update state
     state.budgets = {
         food,
         transport,
         shopping,
-        entertainment
+        entertainment,
+        bills,
+        clothing,
+        fitness,
+        personalcare,
+        gifts,
+        pets,
+        subscriptions,
+        coffee,
+        repairs,
+        savings
     };
 
     // Save to storage

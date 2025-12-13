@@ -700,18 +700,28 @@ body {
     position: relative;
     display: flex;
     align-items: center;
+    gap: 0;
 }
 
 .input-icon {
-    position: absolute;
-    left: 16px;
-    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+    height: 50px;
+    background: var(--gradient-primary);
+    color: white;
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 700;
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: none;
 }
 
 .input-with-icon input {
-    padding-left: 40px;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
+    padding-left: 16px !important;
+    flex: 1;
 }
 
 input[type="text"],
